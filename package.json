@@ -1,0 +1,28 @@
+{
+  "name": "git_applestrudel",
+  "version": "1.0.0",
+  "description": "best strudel is applestrudel",
+  "main": "dist/master.js",
+  "scripts": {
+    "start": "npm run build && node .",
+    "build": "npx tsc",
+    "test": "test"
+  },
+  "keywords": [
+    "tools",
+    "os",
+    "dev",
+    "github",
+    "linux",
+    "applet"
+  ],
+  "author": "darvoid",
+  "license": "MIT",
+  "dependencies": {
+    "systray2": "^2.1.4",
+    "systray3": "file:lib/node-systray"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}
