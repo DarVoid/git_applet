@@ -19,6 +19,8 @@
   "author": "darvoid",
   "license": "MIT",
   "dependencies": {
+    "chrome-launcher": "^0.15.2",
+    "open": "^9.1.0",
     "systray2": "^2.1.4",
     "systray3": "file:lib/node-systray"
   },
