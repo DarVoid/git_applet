@@ -1,5 +1,5 @@
 import SysTray from 'systray3';
-
+import { pedido } from './graphql-handler';
 // const { platform } = require('os');
 const { exec } = require('child_process');
 
@@ -15,20 +15,56 @@ function openGitPersonal(){
     exec(command);
 }
 function openGitWork(){
-    let url= 'https://code.connected.bmw';
+    let url= 'https://google.com';
     let command = `google-chrome --profile-directory=Profile2  --no-sandbox ${url}`;
     exec(command);
 }
 
-`query MyQuery {
+let query1 = `query MyQuery {
     user(login: "darvoid") {
       avatarUrl
     }
   }`
 
+let PR_abertos_proprio = `
+query MyQuery {
+  viewer {
+    pullRequests(orderBy: {field: CREATED_AT, direction: ASC}, first: 100
+        states: OPEN) {
+        edges {
+            node {
+                number
+                permalink
+                reviewRequests {
+                    totalCount
+                }
+            reviews {
+                totalCount
+            }
+            reviewDecision
+            }
+        }
+  }
+  }
+}`
+
+let url = 'https://graphql.github.com/graphql/proxy'
+
+function makeGraphQLCall(){
+    try {
+        let a = pedido(url, PR_abertos_proprio).then((res:any)=>{
+                console.log(res);
+        })
+    } catch (error) {
+        console.error("Erro: ",error);
+    }
+    
+}
+
+
 let noAction= ()=>{}
 
-const systray = new SysTray({
+const systray:SysTray = new SysTray({
     menu: {
         // you should using .png icon in macOS/Linux, but .ico format in windows
         icon: "./assets/tray.png",
@@ -41,14 +77,13 @@ const systray = new SysTray({
                 // checked is implement by plain text in linux
                 checked: false,
                 enabled: true,
-                callback: noAction,
                 items: [
                     {
                         title: "Personal",
                         tooltip: "Personal",
                         checked: false,
                         enabled: true,
-                        callback: openGitPersonal,
+                        callback:{click: openGitPersonal} ,
                         items: [
                             //
                         ]
@@ -57,7 +92,16 @@ const systray = new SysTray({
                         tooltip: "Work",
                         checked: false,
                         enabled: true,
-                        callback: openGitWork,
+                        callback:{click: openGitWork},
+                        items: [
+                            //
+                        ]
+                    },{
+                        title: "graphQL",
+                        tooltip: "Work",
+                        checked: false,
+                        enabled: true,
+                        callback: {click:makeGraphQLCall},
                         items: [
                             //
                         ]
@@ -67,7 +111,6 @@ const systray = new SysTray({
             {
                 title: "<SEPARATOR>",
                 tooltip: "",
-                callback: noAction,
                 enabled: true
             },
             {
@@ -75,43 +118,10 @@ const systray = new SysTray({
                 tooltip: "Exit",
                 checked: false,
                 enabled: true,
-                callback: noAction,
+                callback: {click: ()=> systray.kill()},
             },
         ],
     },
     debug: false,
     copyDir: true, // copy go tray binary to outside directory, useful for packing tool like pkg.
 })
-
-systray.onClick(action => {
-
-    console.log(Object.keys(systray["_conf"]["menu"]["items"].flat()[0]))
-
-    console.log(action.seq_id)
-    // console.log(systray)
-    if (action.seq_id === 2) {
-        // systray.sendAction({
-        //     type: 'update-item',
-        //     item: {
-        //     ...action.item,
-        //     checked: !action.item.checked,
-        //     },
-        //     seq_id: action.seq_id,
-        // })
-        // return
-    } 
-    if (action.seq_id === 1) {
-        // console.log(systray["_conf"]["menu"]["items"].flat()[action.seq_id].callback())
-        console.log('open the url', action)
-        openGitWork()
-    } 
-    if (action.seq_id === 4) {
-        systray.kill()
-    }
-    else if (action.seq_id === 0) {
-        openGitPersonal()
-    }
-        
-
-    }
-)
