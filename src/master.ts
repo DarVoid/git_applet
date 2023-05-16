@@ -3,39 +3,48 @@ import { pedido } from './graphql-handler';
 import launchChrome from 'actions/launchChrome';
 import { readConfig } from 'utils/filesystem';
 
-function openGitPersonal(){
-    launchChrome('https://www.github.com', 'Profile1');
-}
-
-function openGitWork(){
-    launchChrome('https://google.com', 'Profile2');
-}
-
 class Context {
 
-    title: string;
+    title: string = '';
 
-    constructor(title: string) {
-        this.title = title;
+    chromeProfile: string = '';
+
+    githubHost: string = '';
+    githubToken: string = '';
+
+    static fromConfigObject(contextConfig: any): Context {
+        const context = new Context();
+        context.title = contextConfig.title ?? 'Untitled Context';
+        context.chromeProfile = contextConfig.chrome_profile ?? '';
+        context.githubHost = contextConfig?.github?.host ?? 'https://github.com/';
+        context.githubToken = contextConfig?.github?.token ?? '';
+        return context;
     }
 
 }
 
 type ContextList = {[key: string]: Context};
 
+function openGit(context: Context) {
+    launchChrome(context.githubHost, context.chromeProfile);
+}
+
 function loadContexts(config: any): ContextList {
     console.log('Loading contexts');
     const contextConfig = config.contexts ?? {};
     let contexts: ContextList = {};
     Object.keys(contextConfig).forEach(key => {
-        const context = contextConfig[key];
-        contexts[key] = new Context(context.title);
+        contexts[key] = Context.fromConfigObject(contextConfig[key]);
     })
     return contexts;
 }
 
+let currentContextKey: string;
+
 function applyContext(key: string, contexts: ContextList): void {
     console.log(`Applying context "${contexts[key].title}"`);
+    // TODO: Update SysTray => Set checkmark
+    currentContextKey = key;
 }
 
 function generateTray(contexts: ContextList): SysTray {
@@ -54,29 +63,32 @@ function generateTray(contexts: ContextList): SysTray {
                     enabled: true,
                     items: [
                         {
-                            title: "Personal",
-                            tooltip: "Personal",
+                            title: "Open in Chrome",
+                            tooltip: "Open in Chrome",
                             checked: false,
                             enabled: true,
                             callback: {
-                                click: openGitPersonal,
+                                click: () => openGit(contexts[currentContextKey]),
                             },
                             items: [
                                 //
                             ]
-                        },{
-                            title: "Work",
-                            tooltip: "Work",
-                            checked: false,
-                            enabled: true,
-                            callback: {
-                                click: openGitWork,
-                            },
-                            items: [
-                                //
-                            ]
-                        },
+                        }
                     ]
+                },
+                SysTray.separator,
+                {
+                    title: "Change Context",
+                    tooltip: "Change Context",
+                    checked: false,
+                    enabled: true,
+                    items: Object.keys(contexts).map(key => ({
+                        title: contexts[key].title,
+                        tooltip: key,
+                        checked: false,
+                        enabled: true,
+                        callback: { click: () => applyContext(key, contexts) },
+                    })),
                 },
                 SysTray.separator,
                 {

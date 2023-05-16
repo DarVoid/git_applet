@@ -24,7 +24,7 @@ function launchChrome(url: string, profile: string) {
         console.error('Chrome binary not found');
         return;
     }
-    let command = `"${binary}" --profile-directory=${profile}  --no-sandbox ${url}`;
+    let command = `"${binary}" --profile-directory="${profile}"  --no-sandbox "${url}"`;
     exec(command);
 }
 
