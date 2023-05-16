@@ -39,28 +39,38 @@ function loadContexts(config: any): ContextList {
     return contexts;
 }
 
-let currentContextKey: string;
+let items: any;
+
+function updateContextSelected(key: string, state: boolean) {
+    const idx = items.menu.items[2].items.findIndex((item: any) => item.tooltip == key);
+    items.menu.items[2].items[idx].checked = state;
+    systray.sendAction({
+        type: 'update-item',
+        item: items.menu.items[2].items[idx],
+    });
+}
+
+let currentContextKey: string = '';
 
 function applyContext(key: string, contexts: ContextList): void {
     console.log(`Applying context "${contexts[key].title}"`);
-    // TODO: Update SysTray => Set checkmark
+    if(currentContextKey !== '') {
+        Object.keys(contexts).forEach(key => updateContextSelected(key, false));
+    }
+    updateContextSelected(key, true);
     currentContextKey = key;
 }
 
 function generateTray(contexts: ContextList): SysTray {
-    return new SysTray({
+    items = {
         menu: {
             // you should using .png icon in macOS/Linux, but .ico format in windows
             icon: "./assets/tray.png", // TODO: Load .ico on windows ; Load dark-mode variant according to OS theme (or maybe just a config file?)
-            title: '',
             tooltip: "GitHub Applet",
             items: [
                 {
-                    title: "Github ",
+                    title: "Github",
                     tooltip: "Github",
-                    // checked is implement by plain text in linux
-                    checked: false,
-                    enabled: true,
                     items: [
                         {
                             title: "Open in Chrome",
@@ -80,13 +90,10 @@ function generateTray(contexts: ContextList): SysTray {
                 {
                     title: "Change Context",
                     tooltip: "Change Context",
-                    checked: false,
-                    enabled: true,
                     items: Object.keys(contexts).map(key => ({
                         title: contexts[key].title,
                         tooltip: key,
                         checked: false,
-                        enabled: true,
                         callback: { click: () => applyContext(key, contexts) },
                     })),
                 },
@@ -94,8 +101,6 @@ function generateTray(contexts: ContextList): SysTray {
                 {
                     title: "Exit",
                     tooltip: "Exit",
-                    checked: false,
-                    enabled: true,
                     callback: {
                         click: () => systray.kill(),
                     },
@@ -104,7 +109,8 @@ function generateTray(contexts: ContextList): SysTray {
         },
         debug: false,
         copyDir: true, // copy go tray binary to outside directory, useful for packing tool like pkg.
-    });
+    };
+    return new SysTray(items);
 }
 
 let PR_abertos_proprio = `
@@ -131,7 +137,7 @@ query MyQuery {
 
 let url = 'https://graphql.github.com/graphql/proxy'
 
-function makeGraphQLCall(){
+function makeGraphQLCall() {
     try {
         let a = pedido(url, PR_abertos_proprio).then((res:any)=>{
                 console.log(res);
@@ -146,7 +152,8 @@ function makeGraphQLCall(){
 
 const config = readConfig('personal.json');
 const contexts = loadContexts(config);
-const systray: SysTray = generateTray(contexts);
-applyContext(config['default_context'], contexts);
-
-console.log('Running');
+let systray: SysTray = generateTray(contexts);
+systray.ready().then(() => {
+    applyContext(config['default_context'], contexts);
+    console.log('Running');
+});
