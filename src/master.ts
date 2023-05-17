@@ -2,28 +2,7 @@ import SysTray from 'systray3';
 import { pedido } from './graphql-handler';
 import launchChrome from 'actions/launchChrome';
 import { readConfig } from 'utils/filesystem';
-
-class Context {
-
-    title: string = '';
-
-    chromeProfile: string = '';
-
-    githubHost: string = '';
-    githubToken: string = '';
-
-    static fromConfigObject(contextConfig: any): Context {
-        const context = new Context();
-        context.title = contextConfig.title ?? 'Untitled Context';
-        context.chromeProfile = contextConfig.chrome_profile ?? '';
-        context.githubHost = contextConfig?.github?.host ?? 'https://github.com/';
-        context.githubToken = contextConfig?.github?.token ?? '';
-        return context;
-    }
-
-}
-
-type ContextList = {[key: string]: Context};
+import { Context, ContextList } from './config';
 
 function openGit(context: Context) {
     launchChrome(context.githubHost, context.chromeProfile);
