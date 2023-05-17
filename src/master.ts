@@ -2,16 +2,13 @@ import SysTray, { MenuItem } from 'systray3';
 import { readConfig } from 'utils/filesystem';
 import { Context, loadContexts, ContextList, CONFIG_FILE } from './config';
 import openGitHub from 'actions/openGitHub';
-// import openUrl from 'actions/openUrl';
 import { Action, ActionArgs } from 'contracts/Action';
 import { exec } from 'child_process';
 import fetchPRs from 'actions/fetchPRs';
 import {
     Subscription,
-    interval,
-    Observable
+    interval
 } from 'rxjs';
-import {  } from '@apollo/client';
 let items: any;
 
 function updateContextSelected(key: string, state: boolean) {
@@ -117,14 +114,17 @@ const subs:Subscription[]=[];
 const config = readConfig(CONFIG_FILE);
 const contexts: ContextList = loadContexts(config);
 let systray: SysTray = generateTray(contexts);
+
 systray.ready().then(() => {
+
     applyContext(config['default_context'], contexts);
     console.log('Running');
 
-    Object.keys(contexts).forEach((ctx)=>{        
-        subs.push(interval(contexts[ctx].pollFrequency*10).subscribe(()=>{
-            console.log(contexts[ctx].title)
-        })) ; 
-    })
+    // Object.keys(contexts).forEach((ctx)=>{        
+    //     subs.push(interval(contexts[ctx].pollFrequency*20).subscribe(()=>{
+    //         console.log(contexts[ctx].title)
+    //         fetchPRs.apply
+    //     })) ; 
+    // })
 });
 

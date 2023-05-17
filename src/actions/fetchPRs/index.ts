@@ -1,6 +1,7 @@
 import { Action, ActionArgs } from "contracts/Action";
 import { Context } from "config";
 import { query } from "utils/graphql";
+import openUrl from "actions/openUrl";
 
 const gqlQuery = `
 query fetchPRs {
@@ -62,6 +63,14 @@ const fetchPRs: Action = async function(context: Context, args: ActionArgs): Pro
         console.log("Total Requests: %d", totalRequests);
         console.log("Total Reviews: %d", totalReviews);
         console.log(list);
+        let submenuList = list.map((cada)=>{
+            return { title: `[${cada.headRefName}]->[${cada.baseRefName}] ${cada.title}`, handler: openUrl as Action, args: { url: cada.permalink } }
+        });
+        let menu = { 
+            title: `${context.title} Prs: `, items:submenuList
+        }
+        console.log(JSON.stringify(menu))
+        
     } catch(err: any) {
         console.error(err.response?.data ?? err.message);
     }
