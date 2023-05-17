@@ -14,7 +14,7 @@ function launchChrome(url: string, profile: string) {
             ]);
             break;
         case 'linux':
-            binary = 'chrome';
+            binary = 'google-chrome';
             break;
         default:
             console.error('Unsupported platform: ' + platform());
