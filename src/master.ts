@@ -42,11 +42,11 @@ function loadContexts(config: any): ContextList {
 let items: any;
 
 function updateContextSelected(key: string, state: boolean) {
-    const idx = items.menu.items[2].items.findIndex((item: any) => item.tooltip == key);
-    items.menu.items[2].items[idx].checked = state;
+    const idx = items.menu.items[4].items.findIndex((item: any) => item.tooltip == key);
+    items.menu.items[4].items[idx].checked = state;
     systray.sendAction({
         type: 'update-item',
-        item: items.menu.items[2].items[idx],
+        item: items.menu.items[4].items[idx],
     });
 }
 
@@ -61,6 +61,10 @@ function applyContext(key: string, contexts: ContextList): void {
     currentContextKey = key;
 }
 
+const actions = [
+    { title: 'Open GitHub', handler: openGit },
+];
+
 function generateTray(contexts: ContextList): SysTray {
     items = {
         menu: {
@@ -69,23 +73,18 @@ function generateTray(contexts: ContextList): SysTray {
             tooltip: "GitHub Applet",
             items: [
                 {
-                    title: "Github",
-                    tooltip: "Github",
-                    items: [
-                        {
-                            title: "Open in Chrome",
-                            tooltip: "Open in Chrome",
-                            checked: false,
-                            enabled: true,
-                            callback: {
-                                click: () => openGit(contexts[currentContextKey]),
-                            },
-                            items: [
-                                //
-                            ]
-                        }
-                    ]
+                    title: "Context: Work",
+                    tooltip: "Context: Work",
+                    enabled: false,
                 },
+                SysTray.separator,
+                ...actions.map(action => ({
+                    title: action.title,
+                    tooltip: action.title,
+                    callback: {
+                        click: () => action.handler(contexts[currentContextKey]),
+                    },
+                })),
                 SysTray.separator,
                 {
                     title: "Change Context",
@@ -94,6 +93,7 @@ function generateTray(contexts: ContextList): SysTray {
                         title: contexts[key].title,
                         tooltip: key,
                         checked: false,
+                        enabled: true,
                         callback: { click: () => applyContext(key, contexts) },
                     })),
                 },
