@@ -1,14 +1,11 @@
 import SysTray from 'systray3';
 import { pedido } from './graphql-handler';
-import launchChrome from 'actions/launchChrome';
 import { readConfig } from 'utils/filesystem';
-import { Context,loadContexts, ContextList } from './config';
-
-function openGit(context: Context) {
-    launchChrome(context.githubHost, context.chromeProfile);
-}
-
-
+import { Context, loadContexts, ContextList, CONFIG_FILE } from './config';
+import openGitHub from 'actions/openGitHub';
+import openUrl from 'actions/openUrl';
+import { Action } from 'contracts/Action';
+import { exec } from 'child_process';
 
 let items: any;
 
@@ -37,18 +34,28 @@ function teaseStatus() {
     updateStatus(` [${contexts[currentContextKey].title}] ${connected ? 'Connected 🌐' : 'Disconnected 🔌'} `);
 }
 
+function applyGitConfig(userName: string, userEmail: string, userUsername: string, gitHost: string) {
+    exec(`git config --global user.name "${userName}"`);
+    exec(`git config --global user.email "${userEmail}"`);
+    exec(`git config --global credential.helper store`);
+    exec(`git config --global credential.https://${gitHost}.username ${userUsername}`);
+}
+
 function applyContext(key: string, contexts: ContextList): void {
-    console.log(`Applying context "${contexts[key].title}"`);
+    const context: Context = contexts[key];
+    console.log(`Applying context "${context.title}"`);
     if(currentContextKey !== '') {
         Object.keys(contexts).forEach(key => updateContextSelected(key, false));
     }
     currentContextKey = key;
     updateContextSelected(key, true);
     teaseStatus();
+    applyGitConfig(context.gitUserName, context.gitUserEmail, context.githubUsername, context.githubHost);
 }
 
 const actions = [
-    { title: 'Open GitHub', handler: openGit },
+    { title: 'Open GitHub', handler: openGitHub as Action, args: {} },
+    { title: 'Open YouTube', handler: openUrl as Action, args: { url: 'https://www.youtube.com' } },
 ];
 
 function generateTray(contexts: ContextList): SysTray {
@@ -68,7 +75,7 @@ function generateTray(contexts: ContextList): SysTray {
                     title: action.title,
                     tooltip: action.title,
                     callback: {
-                        click: () => action.handler(contexts[currentContextKey]),
+                        click: () => action.handler(contexts[currentContextKey], action.args ?? {}),
                     },
                 })),
                 SysTray.separator,
@@ -101,8 +108,7 @@ function generateTray(contexts: ContextList): SysTray {
 
 
 // Boot
-
-const config = readConfig('personal.json');
+const config = readConfig(CONFIG_FILE);
 const contexts = loadContexts(config);
 let systray: SysTray = generateTray(contexts);
 systray.ready().then(() => {

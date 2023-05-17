@@ -16,7 +16,7 @@ function findFirst(paths: string[]): string | null {
 }
 
 function readConfig(path: string): any {
-    return JSON.parse(fs.readFileSync(path).toString());
+    return JSON.parse(fs.readFileSync(path)?.toString() ?? '') ?? {};
 }
 
 export {

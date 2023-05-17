@@ -4,8 +4,9 @@
             "title": "Personal",
             "chrome_profile": "Profile 1",
             "github": {
-                "host": "https://github.com/",
-                "token_env": "GITHUB_TOKEN"
+                "host": "github.com",
+                "username": "johndoe",
+                "token": "GITHUB_TOKEN"
             },
             "git": {
                 "user": {
@@ -22,8 +23,9 @@
             "title": "Work",
             "chrome_profile": "Profile 2",
             "github": {
-                "host": "https://github.com/",
-                "token_env": "GITHUB_TOKEN"
+                "host": "github.com",
+                "username": "janedoe",
+                "token": "GITHUB_TOKEN"
             },
             "git": {
                 "user": {
