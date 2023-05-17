@@ -19,3 +19,13 @@ export class Context {
 }
 
 export type ContextList = {[key: string]: Context};
+
+export function loadContexts(config: any): ContextList {
+    console.log('Loading contexts');
+    const contextConfig = config.contexts ?? {};
+    let contexts: ContextList = {};
+    Object.keys(contextConfig).forEach(key => {
+        contexts[key] = Context.fromConfigObject(contextConfig[key]);
+    })
+    return contexts;
+}

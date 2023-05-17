@@ -2,21 +2,13 @@ import SysTray from 'systray3';
 import { pedido } from './graphql-handler';
 import launchChrome from 'actions/launchChrome';
 import { readConfig } from 'utils/filesystem';
-import { Context, ContextList } from './config';
+import { Context,loadContexts, ContextList } from './config';
 
 function openGit(context: Context) {
     launchChrome(context.githubHost, context.chromeProfile);
 }
 
-function loadContexts(config: any): ContextList {
-    console.log('Loading contexts');
-    const contextConfig = config.contexts ?? {};
-    let contexts: ContextList = {};
-    Object.keys(contextConfig).forEach(key => {
-        contexts[key] = Context.fromConfigObject(contextConfig[key]);
-    })
-    return contexts;
-}
+
 
 let items: any;
 
@@ -92,40 +84,6 @@ function generateTray(contexts: ContextList): SysTray {
     return new SysTray(items);
 }
 
-let PR_abertos_proprio = `
-query MyQuery {
-  viewer {
-    pullRequests(orderBy: {field: CREATED_AT, direction: ASC}, first: 100
-        states: OPEN) {
-        edges {
-            node {
-                number
-                permalink
-                reviewRequests {
-                    totalCount
-                }
-            reviews {
-                totalCount
-            }
-            reviewDecision
-            }
-        }
-  }
-  }
-}`
-
-let url = 'https://graphql.github.com/graphql/proxy'
-
-function makeGraphQLCall() {
-    try {
-        let a = pedido(url, PR_abertos_proprio).then((res:any)=>{
-                console.log(res);
-        })
-    } catch (error) {
-        console.error("Erro: ",error);
-    }
-
-}
 
 // Boot
 
