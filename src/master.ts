@@ -1,11 +1,11 @@
 import SysTray from 'systray3';
-import { pedido } from './graphql-handler';
 import { readConfig } from 'utils/filesystem';
 import { Context, loadContexts, ContextList, CONFIG_FILE } from './config';
 import openGitHub from 'actions/openGitHub';
 import openUrl from 'actions/openUrl';
 import { Action } from 'contracts/Action';
 import { exec } from 'child_process';
+import fetchPRs from 'actions/fetchPRs';
 
 let items: any;
 
@@ -56,6 +56,7 @@ function applyContext(key: string, contexts: ContextList): void {
 const actions = [
     { title: 'Open GitHub', handler: openGitHub as Action, args: {} },
     { title: 'Open YouTube', handler: openUrl as Action, args: { url: 'https://www.youtube.com' } },
+    { title: 'Fetch PR', handler: fetchPRs as Action, args: {} },
 ];
 
 function generateTray(contexts: ContextList): SysTray {
