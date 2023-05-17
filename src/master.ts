@@ -13,23 +13,38 @@ function openGit(context: Context) {
 let items: any;
 
 function updateContextSelected(key: string, state: boolean) {
-    const idx = items.menu.items[4].items.findIndex((item: any) => item.tooltip == key);
-    items.menu.items[4].items[idx].checked = state;
+    const idx = items.menu.items[3 + actions.length].items.findIndex((item: any) => item.tooltip == key);
+    items.menu.items[3 + actions.length].items[idx].checked = state;
     systray.sendAction({
         type: 'update-item',
-        item: items.menu.items[4].items[idx],
+        item: items.menu.items[3 + actions.length].items[idx],
     });
 }
 
+function updateStatus(status: string) {
+    items.menu.items[0].title = status;
+    items.menu.items[0].tooltip = status;
+    systray.sendAction({
+        type: 'update-item',
+        item: items.menu.items[0],
+    });
+}
+
+let connected = true; // TODO: Detect if polling
 let currentContextKey: string = '';
+
+function teaseStatus() {
+    updateStatus(`${connected ? '🌐 Connected' : '🔌 Disconnected'} [${contexts[currentContextKey].title}] `);
+}
 
 function applyContext(key: string, contexts: ContextList): void {
     console.log(`Applying context "${contexts[key].title}"`);
     if(currentContextKey !== '') {
         Object.keys(contexts).forEach(key => updateContextSelected(key, false));
     }
-    updateContextSelected(key, true);
     currentContextKey = key;
+    updateContextSelected(key, true);
+    teaseStatus();
 }
 
 const actions = [
@@ -44,8 +59,8 @@ function generateTray(contexts: ContextList): SysTray {
             tooltip: "GitHub Applet",
             items: [
                 {
-                    title: "Context: Work",
-                    tooltip: "Context: Work",
+                    title: "🕒 Loading...",
+                    tooltip: "🕒 Loading...",
                     enabled: false,
                 },
                 SysTray.separator,
