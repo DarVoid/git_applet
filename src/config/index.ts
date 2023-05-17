@@ -1,3 +1,5 @@
+const milliseconds_in_seconds = 1000;;
+
 class Context {
 
     title: string = '';
@@ -18,7 +20,7 @@ class Context {
         const context = new Context();
         context.title = contextConfig.title ?? 'Untitled Context';
         context.pollEnabled = contextConfig.poll.enabled;
-        context.pollFrequency = contextConfig.poll.frequency_s;
+        context.pollFrequency = contextConfig.poll.frequency_s * milliseconds_in_seconds;
         context.chromeProfile = contextConfig.chrome_profile ?? '';
         context.githubHost = contextConfig?.github?.host ?? 'https://github.com/';
         context.githubUsername = contextConfig?.github?.username ?? '';

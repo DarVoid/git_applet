@@ -69,6 +69,7 @@ const fetchPRs: Action = async function(context: Context, args: ActionArgs): Pro
         let menu = { 
             title: `${context.title} Prs: `, items:submenuList
         }
+        //TODO: QUERO RETORNAR O MENU AQUI ;_______;
         console.log(JSON.stringify(menu))
         
     } catch(err: any) {
