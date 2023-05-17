@@ -1,0 +1,41 @@
+{
+    "contexts": {
+        "personal": {
+            "title": "Personal",
+            "chrome_profile": "Profile 1",
+            "github": {
+                "host": "https://github.com/",
+                "token_env": "GITHUB_TOKEN"
+            },
+            "git": {
+                "user": {
+                    "name": "John Doe",
+                    "email": "johndoe@example.com"
+                }
+            },
+            "poll": {
+                "enabled": true,
+                "frequency_s": 30
+            }
+        },
+        "work": {
+            "title": "Work",
+            "chrome_profile": "Profile 2",
+            "github": {
+                "host": "https://github.com/",
+                "token_env": "GITHUB_TOKEN"
+            },
+            "git": {
+                "user": {
+                    "name": "Jane Doe",
+                    "email": "janedoe@example.com"
+                }
+            },
+            "poll": {
+                "enabled": true,
+                "frequency_s": 30
+            }
+        }
+    },
+    "default_context": "personal"
+}

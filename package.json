@@ -4,10 +4,9 @@
   "description": "best strudel is applestrudel",
   "main": "dist/master.js",
   "scripts": {
-    "start": "npm run build &&  node .",
-    "build": "npx tsc",
-    "test": "test",
-    "fmt": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+    "start": "npm run build && node .",
+    "build": "npx tsc && npx tsc-alias",
+    "test": "test"
   },
   "keywords": [
     "tools",
@@ -29,6 +28,7 @@
     "systray3": "file:lib/node-systray"
   },
   "devDependencies": {
+    "tsc-alias": "^1.8.6",
     "typescript": "^5.0.4"
   }
 }

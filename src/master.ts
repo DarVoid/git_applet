@@ -1,127 +1,111 @@
 import SysTray from 'systray3';
 import { pedido } from './graphql-handler';
-// const { platform } = require('os');
-const { exec } = require('child_process');
+import launchChrome from 'actions/launchChrome';
+import { readConfig } from 'utils/filesystem';
+import { Context,loadContexts, ContextList } from './config';
 
-
-// const osPlatform = platform(); 
-// Personal > dynamic items1
-//  > dynamic items2
-// Work     > dynamic item3
-//          > dynamic item3
-function openGitPersonal(){
-    let url= 'https://www.github.com';
-    let command = `google-chrome --profile-directory=Profile1  --no-sandbox ${url}`;
-    exec(command);
-}
-function openGitWork(){
-    let url= 'https://google.com';
-    let command = `google-chrome --profile-directory=Profile2  --no-sandbox ${url}`;
-    exec(command);
+function openGit(context: Context) {
+    launchChrome(context.githubHost, context.chromeProfile);
 }
 
-let query1 = `query MyQuery {
-    user(login: "darvoid") {
-      avatarUrl
+
+
+let items: any;
+
+function updateContextSelected(key: string, state: boolean) {
+    const idx = items.menu.items[3 + actions.length].items.findIndex((item: any) => item.tooltip == key);
+    items.menu.items[3 + actions.length].items[idx].checked = state;
+    systray.sendAction({
+        type: 'update-item',
+        item: items.menu.items[3 + actions.length].items[idx],
+    });
+}
+
+function updateStatus(status: string) {
+    items.menu.items[0].title = status;
+    items.menu.items[0].tooltip = status;
+    systray.sendAction({
+        type: 'update-item',
+        item: items.menu.items[0],
+    });
+}
+
+let connected = true; // TODO: Detect if polling
+let currentContextKey: string = '';
+
+function teaseStatus() {
+    updateStatus(` [${contexts[currentContextKey].title}] ${connected ? 'Connected 🌐' : 'Disconnected 🔌'} `);
+}
+
+function applyContext(key: string, contexts: ContextList): void {
+    console.log(`Applying context "${contexts[key].title}"`);
+    if(currentContextKey !== '') {
+        Object.keys(contexts).forEach(key => updateContextSelected(key, false));
     }
-  }`
-
-let PR_abertos_proprio = `
-query MyQuery {
-  viewer {
-    pullRequests(orderBy: {field: CREATED_AT, direction: ASC}, first: 100
-        states: OPEN) {
-        edges {
-            node {
-                number
-                permalink
-                reviewRequests {
-                    totalCount
-                }
-            reviews {
-                totalCount
-            }
-            reviewDecision
-            }
-        }
-  }
-  }
-}`
-
-let url = 'https://graphql.github.com/graphql/proxy'
-
-function makeGraphQLCall(){
-    try {
-        let a = pedido(url, PR_abertos_proprio).then((res:any)=>{
-                console.log(res);
-        })
-    } catch (error) {
-        console.error("Erro: ",error);
-    }
-    
+    currentContextKey = key;
+    updateContextSelected(key, true);
+    teaseStatus();
 }
 
+const actions = [
+    { title: 'Open GitHub', handler: openGit },
+];
 
-let noAction= ()=>{}
-
-const systray:SysTray = new SysTray({
-    menu: {
-        // you should using .png icon in macOS/Linux, but .ico format in windows
-        icon: "./assets/tray.png",
-        title: '',
-        tooltip: "GitHub Applet",
-        items: [
-            {
-                title: "Github ",
-                tooltip: "Github",
-                // checked is implement by plain text in linux
-                checked: false,
-                enabled: true,
-                items: [
-                    {
-                        title: "Personal",
-                        tooltip: "Personal",
-                        checked: false,
-                        enabled: true,
-                        callback:{click: openGitPersonal} ,
-                        items: [
-                            //
-                        ]
-                    },{
-                        title: "Work",
-                        tooltip: "Work",
-                        checked: false,
-                        enabled: true,
-                        callback:{click: openGitWork},
-                        items: [
-                            //
-                        ]
-                    },{
-                        title: "graphQL",
-                        tooltip: "Work",
-                        checked: false,
-                        enabled: true,
-                        callback: {click:makeGraphQLCall},
-                        items: [
-                            //
-                        ]
+function generateTray(contexts: ContextList): SysTray {
+    items = {
+        menu: {
+            // you should using .png icon in macOS/Linux, but .ico format in windows
+            icon: "./assets/tray.png", // TODO: Load .ico on windows ; Load dark-mode variant according to OS theme (or maybe just a config file?)
+            tooltip: "GitHub Applet",
+            items: [
+                {
+                    title: "🕒 Loading...",
+                    tooltip: "🕒 Loading...",
+                    enabled: false,
+                },
+                SysTray.separator,
+                ...actions.map(action => ({
+                    title: action.title,
+                    tooltip: action.title,
+                    callback: {
+                        click: () => action.handler(contexts[currentContextKey]),
                     },
-                ]
-            },
-            {
-                title: "<SEPARATOR>",
-                tooltip: "",
-                enabled: true
-            },
-            {
-                title: "Exit",
-                tooltip: "Exit",
-                checked: false,
-                enabled: true,
-                callback: {click: ()=> systray.kill()},
-            },
-        ],
-    },
-    debug: false,
-    copyDir: true, // copy go tray binary to outside directory, useful for packing tool like pkg.
-})
+                })),
+                SysTray.separator,
+                {
+                    title: "Change Context",
+                    tooltip: "Change Context",
+                    items: Object.keys(contexts).map(key => ({
+                        title: contexts[key].title,
+                        tooltip: key,
+                        checked: false,
+                        enabled: true,
+                        callback: { click: () => applyContext(key, contexts) },
+                    })),
+                },
+                SysTray.separator,
+                {
+                    title: "Exit",
+                    tooltip: "Exit",
+                    callback: {
+                        click: () => systray.kill(),
+                    },
+                },
+            ],
+        },
+        debug: false,
+        copyDir: true, // copy go tray binary to outside directory, useful for packing tool like pkg.
+    };
+    return new SysTray(items);
+}
+
+
+// Boot
+
+const config = readConfig('personal.json');
+const contexts = loadContexts(config);
+let systray: SysTray = generateTray(contexts);
+systray.ready().then(() => {
+    applyContext(config['default_context'], contexts);
+    console.log('Running');
+});
