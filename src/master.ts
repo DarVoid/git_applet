@@ -123,7 +123,11 @@ systray.ready().then(() => {
     Object.keys(contexts).forEach((ctx)=>{        
         subs.push(interval(contexts[ctx].pollFrequency).subscribe(()=>{
             console.log(contexts[ctx].title)
-            // fetchPRs.apply
+            if(contexts[ctx].pollEnabled){
+                fetchPRs(contexts[ctx],{})
+            }
+
+
         })) ; 
     })
 });
