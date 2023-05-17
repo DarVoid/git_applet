@@ -94,6 +94,7 @@ function generateTray(contexts: ContextList): SysTray {
                         title: contexts[key].title,
                         tooltip: key,
                         checked: false,
+                        enabled: true,
                         callback: { click: () => applyContext(key, contexts) },
                     })),
                 },
