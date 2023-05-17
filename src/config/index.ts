@@ -10,10 +10,15 @@ class Context {
 
     gitUserName: string = '';
     gitUserEmail: string = '';
+    
+    pollEnabled: boolean = false;
+    pollFrequency: number = 1000;
 
     static fromConfigObject(contextConfig: any): Context {
         const context = new Context();
         context.title = contextConfig.title ?? 'Untitled Context';
+        context.pollEnabled = contextConfig.poll.enabled;
+        context.pollFrequency = contextConfig.poll.frequency_s;
         context.chromeProfile = contextConfig.chrome_profile ?? '';
         context.githubHost = contextConfig?.github?.host ?? 'https://github.com/';
         context.githubUsername = contextConfig?.github?.username ?? '';
