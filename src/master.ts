@@ -34,7 +34,7 @@ let connected = true; // TODO: Detect if polling
 let currentContextKey: string = '';
 
 function teaseStatus() {
-    updateStatus(`${connected ? '🌐 Connected' : '🔌 Disconnected'} [${contexts[currentContextKey].title}] `);
+    updateStatus(` [${contexts[currentContextKey].title}] ${connected ? 'Connected 🌐' : 'Disconnected 🔌'} `);
 }
 
 function applyContext(key: string, contexts: ContextList): void {
