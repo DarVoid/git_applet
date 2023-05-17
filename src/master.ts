@@ -120,11 +120,10 @@ systray.ready().then(() => {
     applyContext(config['default_context'], contexts);
     console.log('Running');
     //TODO: meter aqui polling quando fetch prs nao for uma action (é por isto que acho que deviamos ter so funcoes normais e se quisessemos depois registavamo-las oh and I HATE PROMISES XD
-    // Object.keys(contexts).forEach((ctx)=>{        
-    //     subs.push(interval(contexts[ctx].pollFrequency*20).subscribe(()=>{
-    //         console.log(contexts[ctx].title)
-    //         fetchPRs.apply
-    //     })) ; 
-    // })
+    Object.keys(contexts).forEach((ctx)=>{        
+        subs.push(interval(contexts[ctx].pollFrequency).subscribe(()=>{
+            console.log(contexts[ctx].title)
+            // fetchPRs.apply
+        })) ; 
+    })
 });
-
