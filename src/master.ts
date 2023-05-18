@@ -32,6 +32,7 @@ function updateStatus(status: string) {
 let connected = true; // TODO: Detect if polling
 let currentContextKey: string = '';
 
+
 function teaseStatus() {
     updateStatus(` [${contexts[currentContextKey].title}] ${connected ? 'Connected 🌐' : 'Disconnected 🔌'} `);
 }
@@ -95,6 +96,13 @@ function generateTray(contexts: ContextList): SysTray {
                 },
                 SysTray.separator,
                 {
+                    title: "AQUI",
+                    tooltip: "AQUI",
+                    checked: false,
+                    enabled: true,
+                    
+                },
+                {
                     title: "Exit",
                     tooltip: "Exit",
                     callback: {
@@ -113,6 +121,7 @@ const subs:Subscription[]=[];
 // Boot
 const config = readConfig(CONFIG_FILE);
 const contexts: ContextList = loadContexts(config);
+
 let systray: SysTray = generateTray(contexts);
 
 systray.ready().then(() => {
@@ -120,14 +129,25 @@ systray.ready().then(() => {
     applyContext(config['default_context'], contexts);
     console.log('Running');
     //TODO: meter aqui polling quando fetch prs nao for uma action (é por isto que acho que deviamos ter so funcoes normais e se quisessemos depois registavamo-las oh and I HATE PROMISES XD
-    Object.keys(contexts).forEach((ctx)=>{        
-        subs.push(interval(contexts[ctx].pollFrequency).subscribe(()=>{
-            console.log(contexts[ctx].title)
-            if(contexts[ctx].pollEnabled){
-                fetchPRs(contexts[ctx],{})
+    Object.keys(contexts).forEach((ctx)=>{     
+        const context = contexts[ctx]
+
+        subs.push(interval(context.pollFrequency).subscribe(()=>{
+            console.log(context.title)
+            if(context.pollEnabled){
+                fetchPRs(context,{ callthis: (menuNovo: MenuItem)=>{
+                    console.log("chegou aqui")
+                    //TODO: update the freaking tray
+                    // const idx = items.menu.items[2 + actions.length].items.findIndex((item: any) => item.tooltip == "AQUI");
+                    // console.log(idx)
+                    // items.menu.items[1+ actions.length] = menuNovo
+                    // items.menu.items[2 + actions.length].items[idx] = menuNovo
+                    // systray.sendAction({
+                    //     type: 'update-item',
+                    //     item: items.menu.items[1 + actions.length],
+                    // });
+                }})
             }
-
-
         })) ; 
     })
 });
