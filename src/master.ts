@@ -138,14 +138,14 @@ systray.ready().then(() => {
                 fetchPRs(context,{ callthis: (menuNovo: MenuItem)=>{
                     console.log("chegou aqui")
                     //TODO: update the freaking tray
-                    // const idx = items.menu.items[2 + actions.length].items.findIndex((item: any) => item.tooltip == "AQUI");
+                    const idx = items.menu.items.findIndex((item: any) => item.tooltip == "AQUI");
                     // console.log(idx)
-                    // items.menu.items[1+ actions.length] = menuNovo
+                    items.menu.items[idx] = menuNovo
                     // items.menu.items[2 + actions.length].items[idx] = menuNovo
-                    // systray.sendAction({
-                    //     type: 'update-item',
-                    //     item: items.menu.items[1 + actions.length],
-                    // });
+                    systray.sendAction({
+                        type: 'update-item',
+                        item: items.menu.items[idx],
+                    });
                 }})
             }
         })) ; 

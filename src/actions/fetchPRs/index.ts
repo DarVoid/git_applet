@@ -64,15 +64,14 @@ const fetchPRs: Action = async function(context: Context, args: ActionArgs): Pro
         console.log("Total Reviews: %d", totalReviews);
         console.log(list);
         let submenuList = list.map((cada) => {
-            return { checked: false, enabled: true, title: `[${cada.headRefName}]->[${cada.baseRefName}] ${cada.title}`, tooltip: `yes`, handler: openUrl as Action, args: { url: cada.permalink } }
+            return { checked: false, enabled: true, title: `[${cada.headRefName}]->[${cada.baseRefName}] ${cada.title}`, tooltip: `yes`,
+            callback: {
+                click:  openUrl(context, {url :cada.permalink})
+            }    
+            }
         });
-        let menu = { 
-            title: `${context.title} Prs: `, tooltip: `${context.title} Prs: `, enabled:true, checked:false, items:submenuList
-        }
-        //TODO: QUERO RETORNAR O MENU AQUI ;_______;
-        console.log(menu)
-            // args.menu = submenuList;
-        args.callthis(menu)
+       
+        args.callthis(submenuList)
         
         
     } catch(err: any) {
