@@ -100,6 +100,20 @@ function generateTray(contexts: ContextList): SysTray {
                     tooltip: "AQUI",
                     checked: false,
                     enabled: true,
+                    items:[
+                        {
+                            title:"placeholder",
+                            tooltip: "placeholder",
+                            checked: false,
+                            enabled: true,
+                        },
+                        {
+                            title:"placeholder2",
+                            tooltip: "placeholder2",
+                            checked: false,
+                            enabled: true,
+                        }
+                    ]
                     
                 },
                 {
@@ -107,6 +121,13 @@ function generateTray(contexts: ContextList): SysTray {
                     tooltip: "Exit",
                     callback: {
                         click: () => systray.kill(),
+                    },
+                },
+                {
+                    title: "debugas",
+                    tooltip: "debugas",
+                    callback: {
+                        click: () => {console.log(items.menu)}
                     },
                 },
             ],
@@ -129,25 +150,33 @@ systray.ready().then(() => {
     applyContext(config['default_context'], contexts);
     console.log('Running');
     //TODO: meter aqui polling quando fetch prs nao for uma action (é por isto que acho que deviamos ter so funcoes normais e se quisessemos depois registavamo-las oh and I HATE PROMISES XD
+    const idx = items.menu.items.findIndex((item: any) => item.tooltip == "AQUI");
     Object.keys(contexts).forEach((ctx)=>{     
         const context = contexts[ctx]
-
-        subs.push(interval(context.pollFrequency).subscribe(()=>{
-            console.log(context.title)
-            if(context.pollEnabled){
-                fetchPRs(context,{ callthis: (menuNovo: MenuItem)=>{
-                    console.log("chegou aqui")
-                    //TODO: update the freaking tray
-                    const idx = items.menu.items.findIndex((item: any) => item.tooltip == "AQUI");
-                    // console.log(idx)
-                    items.menu.items[idx] = menuNovo
-                    // items.menu.items[2 + actions.length].items[idx] = menuNovo
-                    systray.sendAction({
-                        type: 'update-item',
-                        item: items.menu.items[idx],
-                    });
-                }})
-            }
-        })) ; 
+        console.log(idx)
+        
+        if(context.pollEnabled){
+            subs.push(interval(context.pollFrequency).subscribe(()=>{
+                console.log(context.title)
+                
+                    fetchPRs(context,{ 
+                        // callthis: (menuNovo: MenuItem[])=>{
+                        // console.log("chegou aqui")
+                        // items.menu.items[8].items = [...menuNovo]
+                        // items.menu.items[idx].items.map((cada:MenuItem)=>{
+                        //     systray.sendAction({
+                        //         type: 'update-item',
+                        //         item: cada,
+                        //     })
+                        // })
+                    // }
+                }
+                    )
+                    
+                    console.log(items.menu.items[idx] )
+                    
+                })); 
+        }
+        
     })
 });
