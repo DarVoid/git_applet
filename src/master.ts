@@ -102,16 +102,40 @@ function generateTray(contexts: ContextList): SysTray {
                     enabled: true,
                     items:[
                         {
-                            title:"placeholder",
+                            title:"---",
                             tooltip: "placeholder",
                             checked: false,
-                            enabled: true,
+                            enabled: false,
                         },
                         {
-                            title:"placeholder2",
+                            title:"---",
+                            tooltip: "placeholder1",
+                            checked: false,
+                            enabled: false,
+                        },
+                        {
+                            title:"---",
                             tooltip: "placeholder2",
                             checked: false,
-                            enabled: true,
+                            enabled: false,
+                        },
+                        {
+                            title:"---",
+                            tooltip: "placeholder3",
+                            checked: false,
+                            enabled: false,
+                        },
+                        {
+                            title:"---",
+                            tooltip: "placeholder4",
+                            checked: false,
+                            enabled: false,
+                        },
+                        {
+                            title:"---",
+                            tooltip: "placeholder5",
+                            checked: false,
+                            enabled: false,
                         }
                     ]
                     
@@ -160,16 +184,26 @@ systray.ready().then(() => {
                 console.log(context.title)
                 
                     fetchPRs(context,{ 
-                        // callthis: (menuNovo: MenuItem[])=>{
-                        // console.log("chegou aqui")
-                        // items.menu.items[8].items = [...menuNovo]
-                        // items.menu.items[idx].items.map((cada:MenuItem)=>{
-                        //     systray.sendAction({
-                        //         type: 'update-item',
-                        //         item: cada,
-                        //     })
-                        // })
-                    // }
+                        callthis: 
+                        (menuNovo: MenuItem[])=>{
+                        console.log("chegou aqui")
+                        // items.menu.items[8].items = menuNovo
+                        
+                        console.log(menuNovo)
+                        menuNovo.forEach((cada:any, idd:number)=>{
+                            Object.keys(cada).forEach(
+                                (key:string)=>{
+                                    items.menu.items[idx].items[idd][key] = cada[key]
+
+                                }
+                            )
+                            systray.sendAction({
+                                type: 'update-item',
+                                item: items.menu.items[idx].items[idd],
+                            })
+                        })
+                        
+                    }
                 }
                     )
                     
