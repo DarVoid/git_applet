@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run build && node .",
     "build": "npx tsc && npx tsc-alias",
+    "package": "pkg dist/master.js --out-path bin",
     "test": "test"
   },
   "keywords": [
@@ -21,8 +22,8 @@
   "dependencies": {
     "@apollo/client": "^3.7.14",
     "@octokit/graphql": "^5.0.5",
-    "axios": "^1.4.0",
     "chrome-launcher": "^0.15.2",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
     "open": "^9.1.0",
