@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 const s_to_ms = (seconds: number)=> {
     let _to_ms = 1000;
     return seconds * _to_ms
@@ -15,7 +17,7 @@ class Context {
 
     gitUserName: string = '';
     gitUserEmail: string = '';
-    
+
     pollEnabled: boolean = false;
     pollFrequency: number = 1000;
 
@@ -47,7 +49,7 @@ function loadContexts(config: any): ContextList {
     return contexts;
 }
 
-const CONFIG_FILE: string = 'config.json';
+const CONFIG_FILE: string = process.argv[2] ?? 'config.json';
 
 export {
     Context,
