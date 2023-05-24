@@ -116,13 +116,6 @@ function generateTray(contexts: ContextList): SysTray {
                         click: () => systray.kill(),
                     },
                 },
-                {
-                    title: "debugas",
-                    tooltip: "debugas",
-                    callback: {
-                        click: () => {console.log(items.menu)}
-                    },
-                },
             ],
         },
         debug: false,

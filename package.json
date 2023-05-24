@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run build && node .",
     "build": "npx tsc && npx tsc-alias",
-    "package": "pkg dist/master.js --out-path bin",
+    "package": "npx pkg dist/master.js --out-path bin",
     "test": "test"
   },
   "keywords": [
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "tsc-alias": "^1.8.6",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "pkg": "^5.8.1"
   }
 }
