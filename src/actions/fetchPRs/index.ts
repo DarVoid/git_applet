@@ -65,7 +65,7 @@ const fetchPRs: Action = async function(context: Context, args: ActionArgs): Pro
         console.log(list);
         
         let submenuList = list.map((cada) => {
-            return { checked: false, enabled: true, title: `[${cada.headRefName}]->[${cada.baseRefName}] ${cada.title.substring(0,12)}`, tooltip: `yes`,
+            return { hidden: false, checked: false, enabled: true, title: `[${cada.headRefName}]->[${cada.baseRefName}] ${cada.title.substring(0,12)}`, tooltip: `yes`,
             callback: {
                  click:   ()=>openUrl(context, {url :cada.permalink})
             }    
