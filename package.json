@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npm run build && node .",
     "build": "npx tsc && npx tsc-alias",
+    "package": "npx pkg dist/master.js --out-path bin",
     "test": "test"
   },
   "keywords": [
@@ -19,16 +20,20 @@
   "author": "darvoid",
   "license": "MIT",
   "dependencies": {
+    "@apollo/client": "^3.7.14",
     "@octokit/graphql": "^5.0.5",
-    "axios": "^1.4.0",
     "chrome-launcher": "^0.15.2",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.3",
+    "graphql": "^16.6.0",
     "open": "^9.1.0",
+    "rxjs": "^7.8.1",
     "systray2": "^2.1.4",
     "systray3": "file:lib/node-systray"
   },
   "devDependencies": {
     "tsc-alias": "^1.8.6",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "pkg": "^5.8.1"
   }
 }

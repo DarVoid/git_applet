@@ -1,3 +1,10 @@
+import process from 'node:process';
+
+const s_to_ms = (seconds: number)=> {
+    let _to_ms = 1000;
+    return seconds * _to_ms
+}
+
 class Context {
 
     title: string = '';
@@ -11,9 +18,14 @@ class Context {
     gitUserName: string = '';
     gitUserEmail: string = '';
 
+    pollEnabled: boolean = false;
+    pollFrequency: number = 1000;
+
     static fromConfigObject(contextConfig: any): Context {
         const context = new Context();
         context.title = contextConfig.title ?? 'Untitled Context';
+        context.pollEnabled = contextConfig.poll.enabled;
+        context.pollFrequency = s_to_ms(contextConfig.poll.frequency_s);
         context.chromeProfile = contextConfig.chrome_profile ?? '';
         context.githubHost = contextConfig?.github?.host ?? 'https://github.com/';
         context.githubUsername = contextConfig?.github?.username ?? '';
@@ -37,7 +49,7 @@ function loadContexts(config: any): ContextList {
     return contexts;
 }
 
-const CONFIG_FILE: string = 'config.json';
+const CONFIG_FILE: string = process.argv[2] ?? 'config.json';
 
 export {
     Context,
