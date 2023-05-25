@@ -96,7 +96,7 @@ function generateTray(contexts: ContextList): SysTray {
                 },
                 SysTray.separator,
                 {
-                    title: "AQUI",
+                    title: "Open PRs:",
                     tooltip: "AQUI",
                     checked: false,
                     enabled: true,
@@ -131,6 +131,9 @@ const contexts: ContextList = loadContexts(config);
 
 let systray: SysTray = generateTray(contexts);
 
+
+ 
+
 systray.ready().then(() => {
 
     applyContext(config['default_context'], contexts);
@@ -140,39 +143,41 @@ systray.ready().then(() => {
     Object.keys(contexts).forEach((ctx)=>{     
         const context = contexts[ctx]
         console.log(idx)
+        let func = ()=> fetchPRs(context,{ 
+            callthis: 
+            (menuNovo: MenuItem[])=>{
+            console.log("chegou aqui")
+            // items.menu.items[8].items = menuNovo
+            
+            let example = {... items.menu.items[idx].items[0] }
+            console.log(example)
+            
+            console.log(menuNovo)
+            menuNovo.forEach((cada:any, idd:number)=>{
+                // items.menu.items[idx].push(cada)
+                Object.keys(cada).forEach(
+                    (key:string)=>{
+                        items.menu.items[idx].items[idd][key] = cada[key]
         
+                    }
+        
+                )
+                systray.sendAction({
+                    type: 'update-item',
+                    item: items.menu.items[idx].items[idd],
+                })
+            })
+            
+        }
+        }
+        )
         if(context.pollEnabled){
+            //first time 
+            func()
             subs.push(interval(context.pollFrequency).subscribe(()=>{
                 console.log(context.title)
-                
-                    fetchPRs(context,{ 
-                        callthis: 
-                        (menuNovo: MenuItem[])=>{
-                        console.log("chegou aqui")
-                        // items.menu.items[8].items = menuNovo
-                        
-                        let example = {... items.menu.items[idx].items[0] }
-                        console.log(example)
-                        
-                        console.log(menuNovo)
-                        menuNovo.forEach((cada:any, idd:number)=>{
-                            // items.menu.items[idx].push(cada)
-                            Object.keys(cada).forEach(
-                                (key:string)=>{
-                                    items.menu.items[idx].items[idd][key] = cada[key]
-
-                                }
-
-                            )
-                            systray.sendAction({
-                                type: 'update-item',
-                                item: items.menu.items[idx].items[idd],
-                            })
-                        })
-                        
-                    }
-                }
-                    )
+                    //each poll
+                    func()
                     
                     console.log(items.menu.items[idx] )
                     
